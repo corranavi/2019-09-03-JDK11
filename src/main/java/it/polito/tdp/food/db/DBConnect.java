@@ -1,7 +1,11 @@
 package it.polito.tdp.food.db;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -17,7 +21,7 @@ public class DBConnect {
 			HikariConfig config = new HikariConfig();
 			config.setJdbcUrl(jdbcURL);
 			config.setUsername("root");
-			config.setPassword("");
+			config.setPassword("provacrucco");
 			
 			// configurazione MySQL
 			config.addDataSourceProperty("cachePrepStmts", "true");
@@ -36,5 +40,7 @@ public class DBConnect {
 			throw new RuntimeException(e);
 		}
 	}
+	
+
 
 }

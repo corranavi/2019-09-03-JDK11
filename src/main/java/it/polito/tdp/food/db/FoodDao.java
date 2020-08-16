@@ -6,6 +6,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
+import it.polito.tdp.food.model.Adiacenza;
 import it.polito.tdp.food.model.Condiment;
 import it.polito.tdp.food.model.Food;
 import it.polito.tdp.food.model.Portion;
@@ -109,6 +111,50 @@ public class FoodDao {
 
 	}
 	
+	public List<String> getPortionWithMaximalCalories(double calories){
+		List<String> result=new ArrayList<>();
+		final String sql="SELECT DISTINCT portion_display_name " + 
+				"FROM food_pyramid_mod.portion AS p " + 
+				"WHERE p.calories<? " + 
+				"ORDER BY portion_display_name";
+		try {
+			Connection conn=DBConnect.getConnection();
+			PreparedStatement st=conn.prepareStatement(sql);
+			st.setDouble(1, calories);
+			ResultSet res=st.executeQuery();
+			while(res.next()) {
+				result.add(res.getString("portion_display_name"));
+			}
+			conn.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return result;
+	}
+	
+	public List<Adiacenza> getAdiacenze(){
+		List<Adiacenza> adiacenze=new ArrayList<>();
+		final String sql="SELECT DISTINCT p1.portion_display_name AS tipo1, p2.portion_display_name AS tipo2, COUNT(*) AS tot " + 
+				"FROM food_pyramid_mod.portion AS p1, food_pyramid_mod.portion AS p2 " + 
+				"WHERE p1.food_code=p2.food_code " + 
+				"AND p1.portion_display_name<p2.portion_display_name " + 
+				"GROUP BY p1.portion_display_name, p2.portion_display_name";
+		try {
+			Connection conn=DBConnect.getConnection();
+			PreparedStatement st=conn.prepareStatement(sql);
+			ResultSet res=st.executeQuery();
+			while(res.next()) {
+				Adiacenza a=new Adiacenza(res.getString("tipo1"),res.getString("tipo2"),res.getInt("tot"));
+				adiacenze.add(a);
+			}
+			conn.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return adiacenze;
+	}
 	
 
 }

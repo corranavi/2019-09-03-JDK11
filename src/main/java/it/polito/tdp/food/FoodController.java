@@ -5,8 +5,10 @@
 package it.polito.tdp.food;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 import it.polito.tdp.food.model.Model;
+import it.polito.tdp.food.model.PorzionePeso;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -40,7 +42,7 @@ public class FoodController {
     private Button btnCammino; // Value injected by FXMLLoader
 
     @FXML // fx:id="boxPorzioni"
-    private ComboBox<?> boxPorzioni; // Value injected by FXMLLoader
+    private ComboBox<String> boxPorzioni; // Value injected by FXMLLoader
 
     @FXML // fx:id="txtResult"
     private TextArea txtResult; // Value injected by FXMLLoader
@@ -54,15 +56,35 @@ public class FoodController {
     @FXML
     void doCorrelate(ActionEvent event) {
     	txtResult.clear();
-    	txtResult.appendText("Cerco porzioni correlate...");
-    	
+    	String vertice=boxPorzioni.getValue();
+    	if(vertice==null) {
+    		txtResult.appendText("Selezionare un tipo di porzione dal menu a tendina.\n");
+    		return;
+    	}
+    	List<PorzionePeso> result=model.neighborsOf(vertice);
+    	if(result.isEmpty()) {
+    		txtResult.appendText("Non ci sono porzioni correlate.\n");
+    		return;
+    	}
+    	for(PorzionePeso pp: result) {
+    		txtResult.appendText(pp+" diversi tipi di cibi con entrambe queste porzioni.\n");
+    	}
     }
 
     @FXML
     void doCreaGrafo(ActionEvent event) {
     	txtResult.clear();
-    	txtResult.appendText("Creazione grafo...");
-    	
+    	double calories=0.0;
+    	try { 
+    		calories=Double.parseDouble(this.txtCalorie.getText());
+    	}catch(NumberFormatException e) {
+    		txtResult.appendText("Inserire un numero (es. 70.0)!\n");
+    		return;
+    	}
+    	this.model.creaGrafo(calories);
+    	this.txtResult.appendText(String.format("Grafo creato con %d vertici e %d archi.\n", model.numVertici(), model.numEdges()));
+    	this.boxPorzioni.getItems().clear();
+    	this.boxPorzioni.getItems().addAll(model.getVertices());
     }
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
